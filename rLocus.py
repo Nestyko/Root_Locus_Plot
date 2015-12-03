@@ -10,6 +10,9 @@ import operator
 import sys
 import functools
 
+max_k = 100
+density = 0.01
+
 def get_x_y(polynom):
     x = []
     y = []
@@ -34,6 +37,13 @@ def get_x_y_from_g_h(g, h, range_of_k=100, density=0.01):
         sys.stdout.flush()
     return x_final, y_final
 
+def str_constants(lang):
+    if lang == 'es':
+        return 'Maximo valor de K = ' + str(max_k) + '\nDensidad = ' + str(density) + '\nSi desea cambiarlas ingrese -1'
+    elif lang == 'en':
+        return 'Max value of K = ' + str(max_k) + '\nDensity = ' + str(density) + '\nIf you want to change them, insert -1'
+
+
 spanish = {
     'g' : "Por favor, ingrese G(s) ('Ceros')",
     'g_num' : "¿Cuantos Polinomios? : ",
@@ -43,6 +53,9 @@ spanish = {
     'real_axis' : 'Eje Real',
     'img_axis' : "Eje Imaginario",
     'graph_title' : 'Gráfica del Lugar de las Raices Reales',
+    'max_k' : 'Por favor ingrese el maximo valor de K\nDefecto = 100\nK = ',
+    'prompt_density' : 'Por favor ingrese la densidad (el tamaño de paso de k para cada iteración):\nDefecto = 0.01\nDensidad = ',
+    'prompt_constants' : "Ingrese las constantes\nMientras mas grande sea k mas tiempo tomará en terminar la gráfica"
 
 }
 
@@ -55,7 +68,9 @@ english = {
     'real_axis' : 'Real Axis',
     'img_axis' : "Imaginary Axis",
     'graph_title' : 'Root Locus Plot',
-
+    'max_k' : 'Please insert the maximun value of k\nDefault: 100\nK = ',
+    'prompt_density' : 'Please insert the density (the step of k for each iteration):\nDefault: 0.01\nDensity =  ',
+    'prompt_constants' : "Insert the constants\n The greater the k the greater the time consumed by the graphic"
 }
 
 languages = {
@@ -63,10 +78,16 @@ languages = {
     'en' : english,
 }
 
+def prompt_constants(lang):
+    lan = languages[lang]
+    print(lan['prompt_constants'])
+
 
 def input_poly(lang):
     lan = languages[lang]
+
     pgrade = int(input(lan['input_poly']))
+
     p = [0]*(pgrade+1)
     for i in range(pgrade+1):
         p[i] = int(input("x^" + str(i) + ": "))
@@ -74,8 +95,19 @@ def input_poly(lang):
 
 def main(language):
     lan = languages[language]
-    print(lan['g'])
-    g_num = int(input(lan['g_num']))
+    print("\n"*80) #Clear Screen
+    print(str_constants(language))#Display constants
+    print('*'*40)
+    g_num = -1
+    while(g_num == -1):
+        print()
+        print(lan['g'])
+        g_num = int(input(lan['g_num']))
+        if g_num == -1:
+            print()
+            max_k = int(input(lan['max_k']))
+            print()
+            density = float(input(lan['prompt_density']))
     g = [None]*g_num
     for i in range(g_num):
         g[i] = input_poly(language)
@@ -89,7 +121,7 @@ def main(language):
 
     h_poly = functools.reduce(operator.mul, h, 1)
 
-    x_final, y_final = get_x_y_from_g_h(g_poly,h_poly)
+    x_final, y_final = get_x_y_from_g_h(g_poly,h_poly, max_k, density)
 
     plt.plot(x_final,y_final)
     plt.xlabel(lan['real_axis'])
@@ -97,10 +129,8 @@ def main(language):
     plt.title(lan['graph_title'])
     plt.show()
 
-#density = int(input("Insert The density (%): "))
-#range_of_k = int(input("Insert the max value of K: "))
-
 def welcome():
+    print("\n"*80) #Clear Screen
     print("************Root Locus Plot************")
     print("***************************************")
     print("Please select the language:")
