@@ -9,6 +9,9 @@ import numpy
 import operator
 import sys
 import functools
+from languages import language
+from user_input import input_float, input_int
+
 
 max_k = 100
 density = 0.01
@@ -44,78 +47,48 @@ def str_constants(lang):
         return 'Max value of K = ' + str(max_k) + '\nDensity = ' + str(density) + '\nIf you want to change them, insert -1'
 
 
-spanish = {
-    'g' : "Por favor, ingrese G(s) ('Ceros')",
-    'g_num' : "¿Cuantos Polinomios? : ",
-    'h' : "Por favor, ingrese H(s) ('Polos')",
-    'h_num' : "¿Cuantos Polinomios? : ",
-    'input_poly' : "Por favor, ingrese el grado del polinomio: ",
-    'real_axis' : 'Eje Real',
-    'img_axis' : "Eje Imaginario",
-    'graph_title' : 'Gráfica del Lugar de las Raices Reales',
-    'max_k' : 'Por favor ingrese el maximo valor de K\nDefecto = 100\nK = ',
-    'prompt_density' : 'Por favor ingrese la densidad (el tamaño de paso de k para cada iteración):\nDefecto = 0.01\nDensidad = ',
-    'prompt_constants' : "Ingrese las constantes\nMientras mas grande sea k mas tiempo tomará en terminar la gráfica"
 
-}
-
-english = {
-    'g' : "Please insert the G(s) ('Zeros')",
-    'g_num' : "How many polynoms?",
-    'input_poly' : "Please insert the polynom grade: ",
-    'h' : "Please insert the H(s) ('Poles')",
-    'h_num' : "How many polynoms?",
-    'real_axis' : 'Real Axis',
-    'img_axis' : "Imaginary Axis",
-    'graph_title' : 'Root Locus Plot',
-    'max_k' : 'Please insert the maximun value of k\nDefault: 100\nK = ',
-    'prompt_density' : 'Please insert the density (the step of k for each iteration):\nDefault: 0.01\nDensity =  ',
-    'prompt_constants' : "Insert the constants\n The greater the k the greater the time consumed by the graphic"
-}
-
-languages = {
-    'es' : spanish,
-    'en' : english,
-}
 
 def prompt_constants(lang):
-    lan = languages[lang]
+    lan = language[lang]
     print(lan['prompt_constants'])
 
 
 def input_poly(lang):
-    lan = languages[lang]
+    lan = language[lang]
 
-    pgrade = int(input(lan['input_poly']))
+    pgrade = input_int(lan['input_poly'], lang)
 
     p = [0]*(pgrade+1)
     for i in range(pgrade+1):
-        p[i] = int(input("x^" + str(i) + ": "))
+        p[i] = input_float("x^" + str(i) + ": ", lang)
     return poly(p)
 
-def main(language):
-    lan = languages[language]
+def main(lang):
+    max_k = 100
+    density = 0.01
+    lan = language[lang]
     print("\n"*80) #Clear Screen
-    print(str_constants(language))#Display constants
+    print(str_constants(lang))#Display constants
     print('*'*40)
     g_num = -1
     while(g_num == -1):
         print()
         print(lan['g'])
-        g_num = int(input(lan['g_num']))
+        g_num = input_int(lan['g_num'],lang)
         if g_num == -1:
             print()
-            max_k = int(input(lan['max_k']))
+            max_k = input_int(lan['max_k'], lang)
             print()
-            density = float(input(lan['prompt_density']))
+            density = input_float(lan['prompt_density'], lang)
     g = [None]*g_num
     for i in range(g_num):
-        g[i] = input_poly(language)
+        g[i] = input_poly(lang)
     print(lan['h'])
-    h_num = int(input(lan['h_num']))
+    h_num = input_int(lan['h_num'],lang)
     h = [None]*h_num
     for i in range(h_num):
-        h[i] = input_poly(language)
+        h[i] = input_poly(lang)
 
     g_poly = functools.reduce(operator.mul, g, 1)
 
@@ -138,7 +111,7 @@ def welcome():
     print("1.- English")
     print("2.- Español")
     print("0.- Exit/Salir")
-    return int(input())
+    return input_int("")
 
 while(True):
     sel = welcome()
