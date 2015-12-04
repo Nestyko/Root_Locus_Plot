@@ -9,9 +9,32 @@ import numpy
 import operator
 import sys
 import functools
+import os
 
 max_k = 100
 density = 0.01
+
+def debug_file(x_final, y_final, range_of_k=100, density=0.01):
+    print("\nGenerating debug File\n")
+    try:
+        dir_fd = os.open('debug', os.O_RDONLY)
+        def opener(path, flags):
+            return os.open(path, flags, dir_fd=dir_fd)
+        k = 0
+        with open('debug.html', 'w', opener=opener) as f:
+            for x,y in zip(x_final,y_final):
+                print ("For k=" + str(k) + ": \n<ul><li>X: " + str(x) + "</li>\n<li>Y: " + str(y) + "</li></ul>", file=f)
+                sys.stdout.write("\rCargando... " + str(round(((k*100)/range_of_k),2)) + "%")
+                sys.stdout.flush()
+                k+=density
+    except Exception:
+        print("Error Opening File")
+    else:
+        pass
+    finally:
+        os.close(dir_fd)
+
+
 
 def get_x_y(polynom):
     x = []
@@ -94,6 +117,8 @@ def input_poly(lang):
     return poly(p)
 
 def main(language):
+    max_k = 100
+    density = 0.01
     lan = languages[language]
     print("\n"*80) #Clear Screen
     print(str_constants(language))#Display constants
@@ -122,6 +147,7 @@ def main(language):
     h_poly = functools.reduce(operator.mul, h, 1)
 
     x_final, y_final = get_x_y_from_g_h(g_poly,h_poly, max_k, density)
+    debug_file(x_final,y_final, max_k, density)
 
     plt.plot(x_final,y_final)
     plt.xlabel(lan['real_axis'])
